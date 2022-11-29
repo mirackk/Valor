@@ -29,10 +29,11 @@ public class LegendsOfValor extends Game{
         monsterTeam.createMonsters(1);
         world.printMap(heroTeam,monsterTeam);
 
-//        for(int i=0;i<3;i++){
-//            Hero hero = heroTeam.heroes[i];
-//            intoANewCell(hero.pos,hero.pos, world.getMap(), hero);
-//        }
+        for(int i=0;i<3;i++){
+            Hero hero = heroTeam.heroes[i];
+            System.out.println("Hi, "+hero.name);
+            intoANewCell(hero.pos,hero.pos, world.getMap(), hero);
+        }
 
         mainLoop();
     }
@@ -54,7 +55,7 @@ public class LegendsOfValor extends Game{
     public void heroTurn(){
         for(int i = 0;i<3;i++){
             Hero hero = heroTeam.heroes[i];
-            System.out.println("Hi, "+hero.name);
+            System.out.println("Hi, "+hero.name+", you are H"+i);
             while (true) {
                 System.out.println("Enter your command, H/h for help");
                 sc = new Scanner(System.in);
@@ -308,7 +309,7 @@ public class LegendsOfValor extends Game{
 
     // the upper bound a hero can tp to
     public int tpLimit(int tpLane){
-        int height = 0;
+        int height = lowestMonster(tpLane);
         for(int i=0;i<heroTeam.heroes.length;i++){
             Hero hero = heroTeam.heroes[i];
             if(hero.lane==tpLane){
