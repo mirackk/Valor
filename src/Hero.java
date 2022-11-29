@@ -89,7 +89,14 @@ public abstract class Hero extends Role {
     // monster dodge  = value * 0.005
     // hero atk = value * 0.1
     public void attack(Monster monster) {
-        int originDamage = (int) ((strength + weapon.getDamage()) * 0.1);
+        int originDamage;
+        if(weapon==null){
+            originDamage = (int) ((strength) * 0.1);
+        }
+        else{
+            originDamage = (int) ((strength + weapon.getDamage()) * 0.1);
+        }
+
         int actualDamage = originDamage - (int) (monster.getDefense() * 0.1);
 
         double dodgeRate = monster.getDodge() * 0.005;

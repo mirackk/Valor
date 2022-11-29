@@ -23,10 +23,16 @@ public class LegendsOfValor extends Game{
         System.out.println("Welcome to Monsters and Heroes game! ");
         System.out.println("Author: Taoyu Chen & Li Xi");
         System.out.println("\n\n");
+        printCMD();
         this.heroTeam = new HeroTeam(3,config);
         this.monsterTeam = new MonsterTeam(config);
         monsterTeam.createMonsters(1);
         world.printMap(heroTeam,monsterTeam);
+
+//        for(int i=0;i<3;i++){
+//            Hero hero = heroTeam.heroes[i];
+//            intoANewCell(hero.pos,hero.pos, world.getMap(), hero);
+//        }
 
         mainLoop();
     }
@@ -49,10 +55,10 @@ public class LegendsOfValor extends Game{
         for(int i = 0;i<3;i++){
             Hero hero = heroTeam.heroes[i];
             System.out.println("Hi, "+hero.name);
-            System.out.println("Enter your command, H/h for help");
-            sc = new Scanner(System.in);
-            String input = sc.nextLine();
             while (true) {
+                System.out.println("Enter your command, H/h for help");
+                sc = new Scanner(System.in);
+                String input = sc.nextLine();
                 if (input.equalsIgnoreCase("q")) {
                     System.out.println("Quiting the game ...");
                     System.exit(0);
@@ -106,6 +112,7 @@ public class LegendsOfValor extends Game{
     // if there is a hero in their attacking range they will attack
     // otherwise they move forward
     public void monsterTurn(){
+        System.out.println("Now is monsters' turn");
         for(int i = 0;i<monsterTeam.monsters.size();i++){
             Monster monster = monsterTeam.monsters.get(i);
             Hero target = meetHero(heroTeam,monster);
@@ -114,10 +121,15 @@ public class LegendsOfValor extends Game{
                 int oldX = monster.pos.getX();
                 int oldY = monster.pos.getY();
                 // if already a monster there, not moving
-                if(world.monsterInCell(oldX-1,oldY,monsterTeam)){
+                if(world.monsterInCell(oldX+1,oldY,monsterTeam)){
                     continue;
                 }
-                monster.setPos(new Position(oldX-1,oldY));
+                monster.setPos(new Position(oldX+1,oldY));
+
+                if(oldX+1==7){
+                    System.out.println("Monster win!");
+                    System.exit(0);
+                }
             }
             // hero in range. attack him.
             else{
@@ -202,6 +214,10 @@ public class LegendsOfValor extends Game{
             }else if(world.heroInCell(x,y,heroTeam)){
                 System.out.println("Already a hero in this cell! Try again");
             }
+            else if(x==0){
+                System.out.println("Hero win!");
+                System.exit(0);
+            }
             else {
                 intoANewCell(oldPos,newPos, map,hero);
                 return true;
@@ -217,6 +233,7 @@ public class LegendsOfValor extends Game{
         map[oldX][oldY].heroExitCell(hero);
         //go into the cell and do correspond thing
         if (map[x][y] instanceof NexusCell) {
+            hero.pos=pos;
             System.out.println("It is a market, do you want to enter?");
             System.out.println("M/m to enter, else to quit and make next move");
             sc = new Scanner(System.in);
@@ -226,29 +243,37 @@ public class LegendsOfValor extends Game{
                 map[x][y].heroIntoCell(hero);
             }
         } else {
+            hero.pos=pos;
             map[x][y].heroIntoCell(hero);
         }
     }
 
     public void telePort(Hero hero){
-        System.out.println("Please enter the coordinate you are teleporting to");
-        sc = new Scanner(System.in);
-
-        System.out.println("Enter row: ");
-        while (!sc.hasNextInt()) {
-            System.out.println("Not int！Enter again");
-            sc.next();
-        }
-        int row = sc.nextInt();
-
-        System.out.println("Enter col: ");
-        while (!sc.hasNextInt()) {
-            System.out.println("Not int！Enter again");
-            sc.next();
-        }
-        int col = sc.nextInt();
-
         while(true){
+            
+            sc = new Scanner(System.in);
+            System.out.println("Do you want to continue to tp? Q/q to quit, other to continue");
+            String input = sc.nextLine();
+            if(input.equalsIgnoreCase("q")){
+                break;
+            }
+
+            System.out.println("Please enter the coordinate you are teleporting to");
+            sc = new Scanner(System.in);
+
+            System.out.println("Enter row: ");
+            while (!sc.hasNextInt()) {
+                System.out.println("Not int！Enter again");
+                sc.next();
+            }
+            int row = sc.nextInt();
+
+            System.out.println("Enter col: ");
+            while (!sc.hasNextInt()) {
+                System.out.println("Not int！Enter again");
+                sc.next();
+            }
+            int col = sc.nextInt();
             // make sure col not in 2 or 5
             int targetLane;
             if(col == 0 || col ==1){
@@ -277,6 +302,7 @@ public class LegendsOfValor extends Game{
             }
             Cell[][] map = world.getMap();
             intoANewCell(hero.pos,new Position(row,col),map,hero);
+            break;
         }
     }
 

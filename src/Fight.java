@@ -12,6 +12,14 @@ public class Fight {
 
     public void attack(Hero hero, MonsterTeam monsterTeam) {
         while (true) {
+            // continue or not
+            sc = new Scanner(System.in);
+            System.out.println("Do you want to continue to attack? Q/q to quit, other to continue");
+            String input = sc.nextLine();
+            if(input.equalsIgnoreCase("q")){
+                break;
+            }
+
             System.out.println("Please enter the coordinate of the monster you want to attack");
             for(int i=0;i<monsterTeam.monsters.size();i++){
                 monsterTeam.monsters.get(i).printMonsterInfo();
@@ -43,12 +51,14 @@ public class Fight {
                 }
             }
             if (target == null) {
+                System.out.println("No monster in this cell");
                 continue;
             }
 
             boolean flag = targetInRange(hero, target, row, col);
             if (!flag) {
                 System.out.println("Monster not in range");
+                continue;
             }
             hero.attack(target);
             if (target.hp <= 0) {
@@ -62,6 +72,14 @@ public class Fight {
 
     public void cast(Hero hero, MonsterTeam monsterTeam) {
         while (true) {
+            // continue or not
+            sc = new Scanner(System.in);
+            System.out.println("Do you want to continue to cast? Q/q to quit, other to continue");
+            String input = sc.nextLine();
+            if(input.equalsIgnoreCase("q")){
+                break;
+            }
+
             System.out.println("Please enter the coordinate of the monster you want to attack");
             for(int i=0;i<monsterTeam.monsters.size();i++){
                 monsterTeam.monsters.get(i).printMonsterInfo();
@@ -93,12 +111,14 @@ public class Fight {
                 }
             }
             if (target == null) {
+                System.out.println("No monster in this cell");
                 continue;
             }
 
             boolean flag = targetInRange(hero, target, row, col);
             if (!flag) {
                 System.out.println("Monster not in range");
+                continue;
             }
             hero.useSpell(target);
             if (target.hp <= 0) {
