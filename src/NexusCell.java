@@ -29,7 +29,7 @@ public class NexusCell extends MarketCell{
 
     @Override
     public void heroExitCell(Hero hero) {
-
+        System.out.println("Exit Nexus");
     }
 
     public void monsterIntoCell(Monster monster){

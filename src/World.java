@@ -180,5 +180,21 @@ public class World {
         System.out.print(type+" - "+type+" - "+type+"  ");
     }
 
+    public boolean heroInCell(int row,int col,HeroTeam heroTeam){
+        for(int heroIndex=0;heroIndex<3;heroIndex++){
+            if(row == heroTeam.heroes[heroIndex].pos.getX()&&col ==heroTeam.heroes[heroIndex].pos.getY()){
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public boolean monsterInCell(int row,int col,MonsterTeam monsterTeam){
+        for(int monsterIndex = 0;monsterIndex<monsterTeam.monsters.size();monsterIndex++){
+            if(row==monsterTeam.monsters.get(monsterIndex).pos.getX()&&col==monsterTeam.monsters.get(monsterIndex).pos.getY()){
+                return true;
+            }
+        }
+        return false;
+    }
 }

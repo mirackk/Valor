@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class LegendsOfValor extends Game{
@@ -78,17 +79,20 @@ public class LegendsOfValor extends Game{
                 } else if (input.equalsIgnoreCase("h")) {
                     printCMD();
                 }else if(input.equalsIgnoreCase("t")){
-                    telePort();
+                    telePort(hero);
                     break;
                 }else if(input.equalsIgnoreCase("r")){
                     hero.pos=hero.home;
                     break;
                 }else if(input.equalsIgnoreCase("mv")){
                     movement(hero);
+                    break;
                 }else if(input.equalsIgnoreCase("a")){
                     fight.attack(hero,monsterTeam);
+                    break;
                 }else if(input.equalsIgnoreCase("s")){
                     fight.cast(hero,monsterTeam);
+                    break;
                 }
                 else{
                     System.out.println("Invalid input, try again");
@@ -104,11 +108,55 @@ public class LegendsOfValor extends Game{
     public void monsterTurn(){
         for(int i = 0;i<monsterTeam.monsters.size();i++){
             Monster monster = monsterTeam.monsters.get(i);
+            Hero target = meetHero(heroTeam,monster);
+            // no hero in attacking range, move
+            if(target==null){
+                int oldX = monster.pos.getX();
+                int oldY = monster.pos.getY();
+                // if already a monster there, not moving
+                if(world.monsterInCell(oldX-1,oldY,monsterTeam)){
+                    continue;
+                }
+                monster.setPos(new Position(oldX-1,oldY));
+            }
+            // hero in range. attack him.
+            else{
+                Random rd = new Random();
+
+                int originDamage = (int) (monster.getDamage() * 0.1);
+                int actualDamage;
+                if (target.armor != null) {
+                    actualDamage = originDamage - (int) (target.defense * 0.1 + target.armor.getReduction() * 0.1);
+                } else {
+                    actualDamage = originDamage;
+                }
+
+                double dodgeRate = target.agility * 0.002;
+                double rate = Math.random();
+                if (rate < dodgeRate) {
+                    System.out.println("Monster " + monster.getName() + " misses attack on " + target.getName());
+                } else {
+                    System.out.println("Monster " + monster.getName() + " attacks " + target.getName() + " with " + actualDamage + " hp");
+                    target.minusHp(actualDamage);
+                    if(target.hp<=0){
+                        System.out.println(target.name+" is defeated. Now respawn");
+                        target.pos = target.home;
+                        fight.revive(target);
+                    }
+                }
+            }
         }
     }
 
-    public boolean meetHero(){
-        return false;
+    // if hero and monster in the same lane and abd(x) <=1, monster can attack
+    public Hero meetHero(HeroTeam heroTeam,Monster monster){
+        for(int i=0;i<heroTeam.heroes.length;i++){
+            Hero hero = heroTeam.heroes[i];
+            if(Math.abs(hero.pos.getX()-monster.pos.getX())<=1&& hero.lane==monster.lane){
+                return hero;
+            }
+        }
+        return null;
     }
 
     public boolean movement(Hero hero) {
@@ -139,7 +187,7 @@ public class LegendsOfValor extends Game{
                 continue;
             }
             // try to move to the new position
-            // check legal
+            // check legal: in the map , not going to inaccessible cell, and not exceed monsters
             Position newPos = new Position(x, y);
             Cell[][] map = world.getMap();
             if (x >= worldSize || y >= worldSize) {
@@ -148,21 +196,25 @@ public class LegendsOfValor extends Game{
             } else if (map[x][y] instanceof InaccessibleCell) {
                 map[x][y].heroIntoCell(hero);
                 return false;
+            }else if(x<lowestMonster(hero.lane)){
+                System.out.println("Hero cannot move behind a monster! Try again");
+                continue;
+            }else if(world.heroInCell(x,y,heroTeam)){
+                System.out.println("Already a hero in this cell! Try again");
             }
             else {
-                intoANewCell(newPos, map,hero);
+                intoANewCell(oldPos,newPos, map,hero);
                 return true;
             }
         }
     }
 
-    public void telePort(){
-
-    }
-
-    public void intoANewCell(Position pos, Cell[][] map,Hero hero) {
+    public void intoANewCell(Position oldPos,Position pos, Cell[][] map,Hero hero) {
+        int oldX = oldPos.getX();
+        int oldY = oldPos.getY();
         int x = pos.getX();
         int y = pos.getY();
+        map[oldX][oldY].heroExitCell(hero);
         //go into the cell and do correspond thing
         if (map[x][y] instanceof NexusCell) {
             System.out.println("It is a market, do you want to enter?");
@@ -174,18 +226,97 @@ public class LegendsOfValor extends Game{
                 map[x][y].heroIntoCell(hero);
             }
         } else {
-            //map[x][y].heroIntoCell();
+            map[x][y].heroIntoCell(hero);
         }
+    }
+
+    public void telePort(Hero hero){
+        System.out.println("Please enter the coordinate you are teleporting to");
+        sc = new Scanner(System.in);
+
+        System.out.println("Enter row: ");
+        while (!sc.hasNextInt()) {
+            System.out.println("Not int！Enter again");
+            sc.next();
+        }
+        int row = sc.nextInt();
+
+        System.out.println("Enter col: ");
+        while (!sc.hasNextInt()) {
+            System.out.println("Not int！Enter again");
+            sc.next();
+        }
+        int col = sc.nextInt();
+
+        while(true){
+            // make sure col not in 2 or 5
+            int targetLane;
+            if(col == 0 || col ==1){
+                targetLane =0;
+            }
+            else if(col == 3 || col==4){
+                targetLane=1;
+            }
+            else if(col==6||col==7){
+                targetLane=2;
+            }
+            else{
+                System.out.println("Invalid column, try again");
+                continue;
+            }
+
+            // make sure not over the hero in target lane
+            if(row<tpLimit(targetLane)){
+                System.out.println("A hero may not teleport to a space ahead of the hero being teleported to, try again");
+                continue;
+            }
+            // make sure no hero in the target cell
+            if(world.heroInCell(row,col,heroTeam)){
+                System.out.println("Already a hero in this cell! Try again");
+                continue;
+            }
+            Cell[][] map = world.getMap();
+            intoANewCell(hero.pos,new Position(row,col),map,hero);
+        }
+    }
+
+    // the upper bound a hero can tp to
+    public int tpLimit(int tpLane){
+        int height = 0;
+        for(int i=0;i<heroTeam.heroes.length;i++){
+            Hero hero = heroTeam.heroes[i];
+            if(hero.lane==tpLane){
+                height = Math.max(hero.pos.getX(),height);
+            }
+        }
+        return height;
+    }
+
+    // the upper bound a hero can move to
+    public int lowestMonster(int mvLane){
+        int height = 0;
+        for(int i=0;i<monsterTeam.monsters.size();i++){
+            Monster monster = monsterTeam.monsters.get(i);
+            if(monster.lane==mvLane){
+                height=Math.max(monster.pos.getX(),height);
+            }
+        }
+        return height;
     }
 
     public void printCMD() {
         System.out.println("");
-        System.out.println("Q/q: quit game");
-        System.out.println("I/i: show current team information");
+        System.out.println("A/a: attack monster");
         System.out.println("B/b: show current Bag information of every team member");
         System.out.println("E/e: change equipment");
-        System.out.println("P/p: drink potions");
+        System.out.println("I/i: show current team information");
         System.out.println("M/m: show map");
+        System.out.println("MV/mv: make movement on hero");
+        System.out.println("P/p: drink potions");
+        System.out.println("Q/q: quit game");
+        System.out.println("R/r: recall. hero will back to his home");
+        System.out.println("S/s: cast a spell on monster");
+        System.out.println("T/t: teleport");
         System.out.println("");
         System.out.println("H/h: show help");
     }

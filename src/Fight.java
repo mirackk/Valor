@@ -12,7 +12,7 @@ public class Fight {
 
     public void attack(Hero hero, MonsterTeam monsterTeam) {
         while (true) {
-            System.out.println("Please enter the coordination of the monster you want to attack");
+            System.out.println("Please enter the coordinate of the monster you want to attack");
             for(int i=0;i<monsterTeam.monsters.size();i++){
                 monsterTeam.monsters.get(i).printMonsterInfo();
             }
@@ -52,6 +52,8 @@ public class Fight {
             }
             hero.attack(target);
             if (target.hp <= 0) {
+                // remove dead monster from the team
+                monsterTeam.monsters.remove(target);
                 afterFight(hero, target);
             }
             break;
@@ -60,7 +62,7 @@ public class Fight {
 
     public void cast(Hero hero, MonsterTeam monsterTeam) {
         while (true) {
-            System.out.println("Please enter the coordination of the monster you want to attack");
+            System.out.println("Please enter the coordinate of the monster you want to attack");
             for(int i=0;i<monsterTeam.monsters.size();i++){
                 monsterTeam.monsters.get(i).printMonsterInfo();
             }
@@ -100,6 +102,8 @@ public class Fight {
             }
             hero.useSpell(target);
             if (target.hp <= 0) {
+                // remove dead monster from the team
+                monsterTeam.monsters.remove(target);
                 afterFight(hero, target);
             }
             break;
@@ -108,7 +112,7 @@ public class Fight {
 
     //check if the target in hero's atk range
     public boolean targetInRange(Hero hero, Monster monster, int row, int col) {
-        if (Math.abs(hero.pos.getX() - row) + Math.abs(hero.pos.getY() - col) <= 1) {
+        if (Math.abs(hero.pos.getX() - row)<= 1&& hero.lane==monster.lane) {
             return true;
         }
         return false;
