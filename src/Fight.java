@@ -21,6 +21,7 @@ public class Fight {
             }
 
             System.out.println("Please enter the coordinate of the monster you want to attack");
+            System.out.println("For example, the left top is (0,0), right top is (0,7) ... ");
             for(int i=0;i<monsterTeam.monsters.size();i++){
                 monsterTeam.monsters.get(i).printMonsterInfo();
             }
@@ -63,6 +64,7 @@ public class Fight {
             hero.attack(target);
             if (target.hp <= 0) {
                 // remove dead monster from the team
+                System.out.println(target.name+" is dead. Your successfully killed it. ");
                 monsterTeam.monsters.remove(target);
                 afterFight(hero, target);
             }
@@ -81,6 +83,7 @@ public class Fight {
             }
 
             System.out.println("Please enter the coordinate of the monster you want to attack");
+            System.out.println("For example, the left top is (0,0), right top is (0,7) ... ");
             for(int i=0;i<monsterTeam.monsters.size();i++){
                 monsterTeam.monsters.get(i).printMonsterInfo();
             }
@@ -123,6 +126,7 @@ public class Fight {
             hero.useSpell(target);
             if (target.hp <= 0) {
                 // remove dead monster from the team
+                System.out.println(target.name+" is dead. Your successfully killed it. ");
                 monsterTeam.monsters.remove(target);
                 afterFight(hero, target);
             }

@@ -126,7 +126,7 @@ public class World {
             }
             System.out.println();
         }
-        System.out.println("H as your heroes places, H as monsters places");
+        System.out.println("H as your heroes places, M as monsters places");
     }
 
     public void boxUp(String type){

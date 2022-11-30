@@ -49,6 +49,10 @@ public class LegendsOfValor extends Game{
                 count =0;
                 monsterTeam.createMonsters(heroTeam.getTeamLevel());
             }
+            System.out.println("\n\nRound End\n\n");
+            System.out.println("Current map: ");
+            world.printMap(heroTeam,monsterTeam);
+            System.out.println("\n\nRound End\n\n");
         }
     }
 
@@ -57,6 +61,7 @@ public class LegendsOfValor extends Game{
             Hero hero = heroTeam.heroes[i];
             System.out.println("Hi, "+hero.name+", you are H"+i);
             while (true) {
+                System.out.println("Before making each move, We recommend you use H/h, M/m, I/i B/b for more information about current status. ");
                 System.out.println("Enter your command, H/h for help");
                 sc = new Scanner(System.in);
                 String input = sc.nextLine();
@@ -260,6 +265,7 @@ public class LegendsOfValor extends Game{
             }
 
             System.out.println("Please enter the coordinate you are teleporting to");
+            System.out.println("For example, the left top is (0,0), right top is (0,7) ... ");
             sc = new Scanner(System.in);
 
             System.out.println("Enter row: ");
